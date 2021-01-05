@@ -28,6 +28,8 @@ func testStub() Conn {
 			return nil
 		case "ECHO":
 			return args[1]
+		case "COMPLEX":
+			return []interface{}{"string", "value"}
 		default:
 			return errors.Errorf("testStub doesn't support command %q", args[0])
 		}
@@ -50,6 +52,14 @@ func TestStub(t *T) {
 		require.Nil(t, stub.Do(Cmd(&foo, "GET", "foo")))
 		assert.Equal(t, 1, foo)
 	}
+
+	{ // Test with complex types
+		var foo []interface{}
+		require.Nil(t, stub.Do(Cmd(&foo, "COMPLEX")))
+		assert.IsType(t, "string", foo[0])
+		assert.IsType(t, "string", foo[1])
+	}
+
 }
 
 func TestStubPipeline(t *T) {
